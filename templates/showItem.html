@@ -1,0 +1,16 @@
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h1>{{ catalog.name }}</h1>
+        
+        {{ item.name }}
+        <br>
+        {{ item.description }}
+        <br>
+        <a href="{{ url_for('editItem', catalog_name = catalog.name, item_name=item.name ) }}" >Edit</a>
+	    <br>
+        <a href="{{ url_for('deleteItem', catalog_name = catalog.name, item_name=item.name ) }}" >Delete</a>
+    </body>
+</html>
