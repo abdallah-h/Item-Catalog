@@ -10,14 +10,29 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+@app.route('/catalog.json/')
+def catalogsJSON():
+    catalogs = session.query(Catalog).all()
+    return jsonify(catalogs=[i.serialize for i in catalogs])
+
+@app.route('/catalog/<catalog_name>/json/')
+def catalogItemsJSON(catalog_name):
+    catalog = session.query(Catalog).filter_by(name = catalog_name).one()
+    items = session.query(Item).filter_by(catalog_id = catalog.id).all()
+    return jsonify(items=[i.serialize for i in items])
+
+@app.route('/catalog/<catalog_name>/item/<item_name>/json')
+def itemJSON(catalog_name, item_name):
+    item = session.query(Item).filter_by(name = item_name).one()
+    return jsonify(item = item.serialize)
 
 @app.route('/')
-@app.route('/catalog')
+@app.route('/catalog/')
 def showMain():
     catalogs = session.query(Catalog).order_by(Catalog.name).all()
     return render_template('main.html',catalogs = catalogs)
 
-@app.route('/catalog/new' ,methods=['GET', 'POST'])
+@app.route('/catalog/new/' ,methods=['GET', 'POST'])
 def newCatalog():
     if request.method == 'POST':
         newCatalog = Catalog(name=request.form['name'])
@@ -28,7 +43,7 @@ def newCatalog():
     else:    
         return render_template('newCatalog.html')
 
-@app.route('/catalog/<catalog_name>/edit' , methods=['GET', 'POST'])
+@app.route('/catalog/<catalog_name>/edit/' , methods=['GET', 'POST'])
 def editCatalog(catalog_name):
     fullCatalogName = catalog_name.replace("+"," ")
     catalog = session.query(Catalog).filter_by(name = fullCatalogName).one()
@@ -42,7 +57,7 @@ def editCatalog(catalog_name):
     else:
         return render_template('editCatalog.html',catalog = catalog)
 
-@app.route('/catalog/<catalog_name>/delete' , methods=['GET', 'POST'])
+@app.route('/catalog/<catalog_name>/delete/' , methods=['GET', 'POST'])
 def deleteCatalog(catalog_name):
     fullCatalogName = catalog_name.replace("+"," ")
     catalog = session.query(Catalog).filter_by(name = fullCatalogName).one()
@@ -54,14 +69,14 @@ def deleteCatalog(catalog_name):
     else:
         return render_template('deleteCatalog.html',catalog = catalog)
 
-@app.route('/catalog/<catalog_name>/item')
+@app.route('/catalog/<catalog_name>/item/')
 def showCatalog(catalog_name):
     fullCatalogName = catalog_name.replace("+"," ")
     catalog = session.query(Catalog).filter_by(name = fullCatalogName).one()
     items = session.query(Item).filter_by(catalog_id = catalog.id).all()
     return render_template('showCatalog.html',catalog = catalog, items=items)
 
-@app.route('/catalog/<catalog_name>/item/<item_name>')
+@app.route('/catalog/<catalog_name>/item/<item_name>/')
 def showItem(catalog_name, item_name):
     fullCatalogName = catalog_name.replace("+"," ")
     fullItemName = item_name.replace("+"," ")
@@ -69,7 +84,7 @@ def showItem(catalog_name, item_name):
     item = session.query(Item).filter_by(name = fullItemName).one()
     return render_template('showItem.html',catalog = catalog, item=item)
 
-@app.route('/catalog/<catalog_name>/item/new' , methods=['GET', 'POST'])
+@app.route('/catalog/<catalog_name>/item/new/' , methods=['GET', 'POST'])
 def newItem(catalog_name):
     fullCatalogName = catalog_name.replace("+"," ")
     catalog = session.query(Catalog).filter_by(name = fullCatalogName).one()
@@ -82,7 +97,7 @@ def newItem(catalog_name):
     else:
         return render_template('newItem.html', catalog=catalog)
 
-@app.route('/catalog/<catalog_name>/item/<item_name>/edit' , methods=['GET', 'POST'])
+@app.route('/catalog/<catalog_name>/item/<item_name>/edit/' , methods=['GET', 'POST'])
 def editItem(catalog_name, item_name):
     fullItemName = item_name.replace("+"," ")
     fullCatalogName = catalog_name.replace("+"," ")
@@ -100,7 +115,7 @@ def editItem(catalog_name, item_name):
     else:
         return render_template('editItem.html', item=item , catalog=catalog)
 
-@app.route('/catalog/<catalog_name>/item/<item_name>/delete' , methods=['GET', 'POST'])
+@app.route('/catalog/<catalog_name>/item/<item_name>/delete/' , methods=['GET', 'POST'])
 def deleteItem(catalog_name, item_name):
     fullItemName = item_name.replace("+"," ")
     item = session.query(Item).filter_by(name = fullItemName).one()
