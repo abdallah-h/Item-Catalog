@@ -3,7 +3,7 @@
 
     </head>
     <body>
-        <h1>Catalog Item</h1>
+        <h1>{{ catalog.name }}</h1>
 
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -16,13 +16,9 @@
         {% endif %}
         {% endwith %}
 
-        <a href = "{{ url_for('newCatalog') }}">Create New Catalog</a>
-        <br>
-
-        {% for i in catalogs %}
-        <a href="{{ url_for('showCatalog', catalog_name = i.name) }}" >{{ i.name }}</a>
+        {% for i in items %}
+        <a href="{{ url_for('showItem', catalog_name = catalog.name, item_name=i.name ) }}" >{{i.name}}</a>
+            <br><br>
         {% endfor %}
-        <br><br>
-
     </body>
 </html>

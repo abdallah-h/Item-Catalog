@@ -16,13 +16,8 @@
         {% endif %}
         {% endwith %}
 
-        <a href = "{{ url_for('newCatalog') }}">Create New Catalog</a>
-        <br>
-
         {% for i in catalogs %}
-        <a href="{{ url_for('showCatalog', catalog_name = i.name) }}" >{{ i.name }}</a>
+            {{ i.name }}
         {% endfor %}
-        <br><br>
-
     </body>
 </html>
