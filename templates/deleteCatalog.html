@@ -1,6 +1,5 @@
 {% extends "main.html" %}
 {% block content %}
-{% include "header.html" %}
 <h2> Are you sure you want to delete {{catalog.name}}? </h2>
 
 <form action="{{ url_for('deleteCatalog',catalog_name = catalog.name) }}" method = 'post'>
