@@ -1,28 +1,14 @@
-<html>
-    <head>
-
-    </head>
-    <body>
-        <h1>Catalog Item</h1>
-
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          
-        <ul>
-        {% for message in messages %}
-            <li> <strong> {{ message }} </strong> </li>
-        {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
-
-        <a href = "{{ url_for('newCatalog') }}">Create New Catalog</a>
-        <br>
-
-        {% for i in catalogs %}
-        <a href="{{ url_for('showCatalog', catalog_name = i.name) }}" >{{ i.name }}</a>
-        {% endfor %}
-        <br><br>
-
-    </body>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<link rel='stylesheet' type='text/css' href='http://fonts.googleapis.com/css?family=Roboto:400,300,700'>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+		<link rel='stylesheet' type='text/css' href="{{ url_for('static', filename='styles.css') }}">
+	</head>
+	<body>
+		<div class="container">
+			{% block content %}
+			{% endblock %}
+		</div>
+	</body>
 </html>

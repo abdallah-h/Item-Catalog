@@ -99,11 +99,6 @@ def fbdisconnect():
     url = 'https://graph.facebook.com/%s/permissions?access_token=%s' % (facebook_id,access_token)
     h = httplib2.Http()
     result = h.request(url, 'DELETE')[1]
-    del login_session['access_token']
-    del login_session['gplus_id']
-    del login_session['username']
-    del login_session['email']
-    del login_session['picture']
     return "you have been logged out"
 
 @app.route('/gconnect', methods=['POST'])
@@ -232,11 +227,6 @@ def gdisconnect():
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     if result['status'] == '200':
-        del login_session['access_token']
-        del login_session['gplus_id']
-        del login_session['username']
-        del login_session['email']
-        del login_session['picture']
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -268,7 +258,7 @@ def showMain():
     if 'username' not in login_session:
         return render_template('publicMain.html', catalogs=catalogs)
     else:
-        return render_template('main.html',catalogs = catalogs)
+        return render_template('catalogs.html',catalogs = catalogs)
 
 @app.route('/catalog/new/' ,methods=['GET', 'POST'])
 def newCatalog():
@@ -279,7 +269,7 @@ def newCatalog():
         session.add(newCatalog)
         session.commit()
         flash("new catalog created!")
-        return redirect(url_for('showMain'))
+        return redirect(url_for('showCatalog' ,catalog_name = newCatalog.name))
     else:    
         return render_template('newCatalog.html')
 
@@ -297,7 +287,7 @@ def editCatalog(catalog_name):
         session.add(catalog)
         session.commit()
         flash("catalog has been edited!")
-        return redirect(url_for('showMain'))
+        return redirect(url_for('showCatalog' ,catalog_name = catalog.name))
     else:
         return render_template('editCatalog.html',catalog = catalog)
 
@@ -308,10 +298,7 @@ def deleteCatalog(catalog_name):
     if 'username' not in login_session:
         return redirect('/login')
     if catalog.user_id != login_session.get('user_id'):
-        return """<script>function myFunction() 
-        {alert('You are not authorized to delete this catalog. 
-        Please create your own catalog in order to delete.');}
-        </script><body onload='myFunction()'>"""
+        return """<script>function myFunction(){alert('You are not authorized to delete this catalog. Please create your own catalog in order to delete.');}</script><body onload='myFunction()'>"""
     if request.method == 'POST':
         session.delete(catalog)
         session.commit()
@@ -348,10 +335,7 @@ def newItem(catalog_name):
     if 'username' not in login_session:
         return redirect('/login')
     if catalog.user_id != login_session.get('user_id'):
-        return """<script>function myFunction() 
-        {alert('You are not authorized to add item to this catalog. 
-        Please create your own catalog in order to add new items to it.');}
-        </script><body onload='myFunction()'>"""
+        return """<script>function myFunction(){alert('You are not authorized to add item to this catalog. Please create your own catalog in order to add new items to it.');}</script><body onload='myFunction()'>"""
     if request.method == 'POST':
         newItem = Item(name = request.form['name'],description = request.form['description'], 
                     catalog_id = catalog.id , user_id=catalog.user_id)
@@ -392,10 +376,7 @@ def deleteItem(catalog_name, item_name):
     if 'username' not in login_session:
         return redirect('/login')
     if catalog.user_id != login_session.get('user_id'):
-        return """<script>function myFunction() 
-        {alert('You are not authorized to delete this item. 
-        Please create your own item in order to delete.');}
-        </script><body onload='myFunction()'>"""
+        return """<script>function myFunction(){alert('You are not authorized to delete this item. Please create your own item in order to delete.');}</script><body onload='myFunction()'>"""
     if request.method == 'POST':
         session.delete(item)
         session.commit()
@@ -403,6 +384,28 @@ def deleteItem(catalog_name, item_name):
         return redirect(url_for('showCatalog', catalog_name=catalog_name))
     else:
         return render_template('deleteItem.html', item=item , catalog= catalog)
+
+# Disconnect based on provider
+@app.route('/disconnect')
+def disconnect():
+    if 'provider' in login_session:
+        if login_session['provider'] == 'google':
+            gdisconnect()
+            del login_session['gplus_id']
+            del login_session['access_token']
+        if login_session['provider'] == 'facebook':
+            fbdisconnect()
+            del login_session['facebook_id']
+        del login_session['username']
+        del login_session['email']
+        del login_session['picture']
+        del login_session['user_id']
+        del login_session['provider']
+        flash("You have successfully been logged out.")
+        return redirect(url_for('showMain'))
+    else:
+        flash("You were not logged in")
+        return redirect(url_for('showMain'))
 
 if __name__ == '__main__':
     app.secret_key = 'secret_key'
