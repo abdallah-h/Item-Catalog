@@ -1,37 +1,20 @@
 {% extends "main.html" %}
 {% block content %}
-	<div class="row divider green">
-		<div class="col-md-12"></div>
-	</div>
-	<div class="row banner menu">
+	<div class="row">
 		<div class="col-md-11 col-md-offset-1 padding-none">
 			<h1>{{ catalog.name }}</h1>
 		</div>
 	</div>
-
-    <div class = 'flash'>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          
-        <ul>
-        {% for message in messages %}
-            <li> <strong> {{ message }} </strong> </li>
-        {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
-
-    </div>
 	
 	{% if items !=[] %}	
 		<div class="row">
 			<div class="col-md-1"></div>
-			<div class="col-md-3">
+			<div class="col-md-9">
 				{% for i in items %}
                     <a href = "{{url_for('showItem', catalog_name = catalog.name, item_name=i.name)}}">
                         <div class="row">
                             <div class="col-md-1"></div>
-                                <div class="col-md-10 restaurant-list">
+                                <div class="col-md-10 catalog-items">
                                     <h3>{{i.name}}</h3>
                                 </div>
                             <div class="col-md-1"></div>

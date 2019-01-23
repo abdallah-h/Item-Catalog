@@ -17,9 +17,11 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+# Load clint info from client_secrets.json file
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
 APPLICATION_NAME = "Catalog Item"
+
 
 @app.route('/login')
 def showLogin():
@@ -28,6 +30,7 @@ def showLogin():
     login_session['state'] = state
     return render_template('login.html', STATE=state)
 
+# Add facebook login Oauth
 @app.route('/fbconnect', methods=['POST'])
 def fbconnect():
     if request.args.get('state') != login_session['state']:
@@ -45,7 +48,6 @@ def fbconnect():
         app_id, app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
-
 
     # Use token to get user info from API
     userinfo_url = "https://graph.facebook.com/v3.2/me"
@@ -90,7 +92,7 @@ def fbconnect():
     flash("You now logged in as %s" % login_session['username'])
     return output
 
-
+# Disconnect facebook account from the app
 @app.route('/fbdisconnect')
 def fbdisconnect():
     facebook_id = login_session.get('facebook_id')
@@ -101,6 +103,7 @@ def fbdisconnect():
     result = h.request(url, 'DELETE')[1]
     return "you have been logged out"
 
+# Add Google login Oauth
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
@@ -171,6 +174,7 @@ def gconnect():
     login_session['username'] = data['name']
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
+    
     # ADD PROVIDER TO LOGIN SESSION
     login_session['provider'] = 'google'
 
@@ -192,10 +196,8 @@ def gconnect():
     return output
 
 # User Helper Functions
-
 def createUser(login_session):
-    newUser = User(name=login_session['username'], email=login_session[
-                   'email'], picture=login_session['picture'])
+    newUser = User(name=login_session['username'], email=login_session['email'], picture=login_session['picture'])
     session.add(newUser)
     session.commit()
     user = session.query(User).filter_by(email=login_session['email']).one()
@@ -212,8 +214,7 @@ def getUserID(email):
     except:
         return None
 
-# DISCONNECT - Revoke a current user's token and reset their login_session
-
+# Disconnect Google account from the app
 @app.route('/gdisconnect')
 def gdisconnect():
     # Only disconnect a connected user.
@@ -235,6 +236,7 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
+# Add function to return JSON format of the database
 @app.route('/catalog.json/')
 def catalogsJSON():
     catalogs = session.query(Catalog).all()
@@ -251,6 +253,7 @@ def itemJSON(catalog_name, item_name):
     item = session.query(Item).filter_by(name = item_name).one()
     return jsonify(item = item.serialize)
 
+# Main page of the app
 @app.route('/')
 @app.route('/catalog/')
 def showMain():
@@ -260,6 +263,7 @@ def showMain():
     else:
         return render_template('catalogs.html',catalogs = catalogs)
 
+# make new category
 @app.route('/catalog/new/' ,methods=['GET', 'POST'])
 def newCatalog():
     if 'username' not in login_session:
@@ -268,15 +272,15 @@ def newCatalog():
         newCatalog = Catalog(name=request.form['name'], user_id=login_session.get('user_id'))
         session.add(newCatalog)
         session.commit()
-        flash("new catalog created!")
+        flash("New catalog created!")
         return redirect(url_for('showCatalog' ,catalog_name = newCatalog.name))
     else:    
         return render_template('newCatalog.html')
 
+# edit category
 @app.route('/catalog/<catalog_name>/edit/' , methods=['GET', 'POST'])
 def editCatalog(catalog_name):
-    fullCatalogName = catalog_name.replace("+"," ")
-    catalog = session.query(Catalog).filter_by(name = fullCatalogName).one()
+    catalog = session.query(Catalog).filter_by(name = catalog_name).one()
     if 'username' not in login_session:
         return redirect('/login')
     if catalog.user_id != login_session.get('user_id'):
@@ -286,15 +290,15 @@ def editCatalog(catalog_name):
             catalog.name = request.form['name']
         session.add(catalog)
         session.commit()
-        flash("catalog has been edited!")
+        flash("Catalog has been edited!")
         return redirect(url_for('showCatalog' ,catalog_name = catalog.name))
     else:
         return render_template('editCatalog.html',catalog = catalog)
 
+# delete existing catalog
 @app.route('/catalog/<catalog_name>/delete/' , methods=['GET', 'POST'])
 def deleteCatalog(catalog_name):
-    fullCatalogName = catalog_name.replace("+"," ")
-    catalog = session.query(Catalog).filter_by(name = fullCatalogName).one()
+    catalog = session.query(Catalog).filter_by(name = catalog_name).one()
     if 'username' not in login_session:
         return redirect('/login')
     if catalog.user_id != login_session.get('user_id'):
@@ -302,36 +306,35 @@ def deleteCatalog(catalog_name):
     if request.method == 'POST':
         session.delete(catalog)
         session.commit()
-        flash("delete Catalog")
+        flash("Catalog has been deleted")
         return redirect(url_for('showMain'))
     else:
         return render_template('deleteCatalog.html',catalog = catalog)
 
+# display the items of the catalog
 @app.route('/catalog/<catalog_name>/item/')
 def showCatalog(catalog_name):
-    fullCatalogName = catalog_name.replace("+"," ")
-    catalog = session.query(Catalog).filter_by(name = fullCatalogName).one()
+    catalog = session.query(Catalog).filter_by(name = catalog_name).one()
     items = session.query(Item).filter_by(catalog_id = catalog.id).all()
     if 'username' not in login_session:
         return render_template('publicCatalog.html', catalog=catalog, items=items)
     else:
         return render_template('showCatalog.html',catalog = catalog, items=items)
 
+# display the details of the item
 @app.route('/catalog/<catalog_name>/item/<item_name>/')
 def showItem(catalog_name, item_name):
-    fullCatalogName = catalog_name.replace("+"," ")
-    fullItemName = item_name.replace("+"," ")
-    catalog = session.query(Catalog).filter_by(name = fullCatalogName).one()
-    item = session.query(Item).filter_by(name = fullItemName).one()
+    catalog = session.query(Catalog).filter_by(name = catalog_name).one()
+    item = session.query(Item).filter_by(name = item_name).one()
     if 'username' not in login_session:
         return render_template('publicItem.html', catalog=catalog, item=item)
     else:
         return render_template('showItem.html',catalog = catalog, item=item)
 
+# create new item
 @app.route('/catalog/<catalog_name>/item/new/' , methods=['GET', 'POST'])
 def newItem(catalog_name):
-    fullCatalogName = catalog_name.replace("+"," ")
-    catalog = session.query(Catalog).filter_by(name = fullCatalogName).one()
+    catalog = session.query(Catalog).filter_by(name = catalog_name).one()
     if 'username' not in login_session:
         return redirect('/login')
     if catalog.user_id != login_session.get('user_id'):
@@ -341,17 +344,16 @@ def newItem(catalog_name):
                     catalog_id = catalog.id , user_id=catalog.user_id)
         session.add(newItem)
         session.commit()
-        flash("new item created")
+        flash("new item successfully created")
         return redirect(url_for('showCatalog', catalog_name=catalog_name))
     else:
         return render_template('newItem.html', catalog=catalog)
 
+# edit existing item
 @app.route('/catalog/<catalog_name>/item/<item_name>/edit/' , methods=['GET', 'POST'])
 def editItem(catalog_name, item_name):
-    fullItemName = item_name.replace("+"," ")
-    fullCatalogName = catalog_name.replace("+"," ")
-    item = session.query(Item).filter_by(name = fullItemName).one()
-    catalog = session.query(Catalog).filter_by(name = fullCatalogName).one()
+    item = session.query(Item).filter_by(name = item_name).one()
+    catalog = session.query(Catalog).filter_by(name = catalog_name).one()
     if 'username' not in login_session:
         return redirect('/login')
     if catalog.user_id != login_session.get('user_id'):
@@ -363,15 +365,15 @@ def editItem(catalog_name, item_name):
             item.description = request.form['description']
         session.add(item)
         session.commit()
-        flash("edit Item")
+        flash("Item has been edited")
         return redirect(url_for('showItem', catalog_name=catalog_name , item_name=item.name))
     else:
         return render_template('editItem.html', item=item , catalog=catalog)
 
+# delete existing item
 @app.route('/catalog/<catalog_name>/item/<item_name>/delete/' , methods=['GET', 'POST'])
 def deleteItem(catalog_name, item_name):
-    fullItemName = item_name.replace("+"," ")
-    item = session.query(Item).filter_by(name = fullItemName).one()
+    item = session.query(Item).filter_by(name = item_name).one()
     catalog = session.query(Catalog).filter_by(id = item.catalog_id).one()
     if 'username' not in login_session:
         return redirect('/login')
@@ -380,7 +382,7 @@ def deleteItem(catalog_name, item_name):
     if request.method == 'POST':
         session.delete(item)
         session.commit()
-        flash("delete Item")
+        flash("Item has been deleted")
         return redirect(url_for('showCatalog', catalog_name=catalog_name))
     else:
         return render_template('deleteItem.html', item=item , catalog= catalog)

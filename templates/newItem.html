@@ -1,11 +1,8 @@
 {% extends "main.html" %}
 {% block content %}
-	<div class="row divider green">
-		<div class="col-md-12"></div>
-	</div>
-	<div class="row banner menu">
+	<div class="row">
 		<div class="col-md-11 col-md-offset-1 padding-none">
-			<h1>New Catalog Item</h1>
+			<h1>New <span>{{catalog.name}}</span> Item</h1>
 		</div>
 	</div>
 	<div class="row">
@@ -13,15 +10,15 @@
 			<form action="#" method = "post">
 				<div class="form-group">
 					<label for="name">Name:</label>
-					<input type ="text" maxlength="50" class="form-control" name="name"placeholder="Name of the course">
+					<input type ="text" maxlength="100" class="form-control" name="name"placeholder="Name of the Item">
 
 					<label for="description">Description:</label>
-					<textarea class="form-control" maxlength="250" rows="3" name="description" placeholder="Description of the course"></textarea>
+					<textarea class="form-control" maxlength="1000" rows="5" name="description" placeholder="Description of the Item"></textarea>
 
 					<button type="submit" class="btn btn-default" id="submit" type="submit">
-                    <span class="glyphicon glyphicon-glass" aria-hidden="true"></span>Create</button>
+                    <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Create</button>
                     <a href = "{{ url_for('showCatalog' , catalog_name=catalog.name)}}">
-                            <button class="btn btn-default delete" type="button">
+                            <button class="btn btn-default" type="button">
                             <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Cancel</button>
                     </a>
 				</div>

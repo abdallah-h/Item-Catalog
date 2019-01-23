@@ -1,15 +1,9 @@
 {% extends "main.html" %}
 {% block content %}
-	<div class="row banner menu">
-		<div class="col-md-11 col-md-offset-1 padding-none">
-			<h1>{{ catalog.name }}</h1>
-		</div>
-	</div>
-
+	
 	<div class = 'flash'>
 			{% with messages = get_flashed_messages() %}
 			{% if messages %}
-			  
 			<ul>
 			{% for message in messages %}
 				<li> <strong> {{ message }} </strong> </li>
@@ -17,17 +11,23 @@
 			</ul>
 			{% endif %}
 			{% endwith %}
-	
 	</div>
 	
 	<div class="row">
 		<div class="col-md-1"></div>
-			<div class="menu-item">
-				<h3>{{item.name}}</h3>
-				<p>{{item.description}}</p>
-				<a href="{{ url_for('editItem', catalog_name = catalog.name, item_name=item.name ) }}" >Edit</a>
-				<span> | </span>
-				<a href="{{ url_for('deleteItem', catalog_name = catalog.name, item_name=item.name ) }}" >Delete</a>
+			<div class="item-details">
+				<h2>{{item.name}}</h2>
+				<p>Description: {{item.description}}</p>
+				<a href="{{ url_for('editItem', catalog_name = catalog.name, item_name=item.name )}}">
+					<button class="btn btn-default">
+						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>Edit Item
+					</button>
+				</a>
+				<a href="{{ url_for('deleteItem', catalog_name = catalog.name, item_name=item.name )}}">
+					<button class="btn btn-default delete">
+						<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete Item
+					</button>
+				</a>
 			</div>
 		<div class="col-md-1"></div>
 	</div>
