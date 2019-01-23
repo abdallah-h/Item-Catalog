@@ -5,7 +5,7 @@
 
 h1 {
 	font-family: "Helvetica Neue Light", Roboto, Helvetica, Arial, sans-serif;
-	font-size: 10px;
+	font-size: 50px;
 	color: #51453B;
 	line-height: 50px;
 	font-weight: 300;
@@ -77,7 +77,7 @@ p {
 .top-menu{
 	padding-top: 10px;
 	padding-bottom: 30px;
-	background: #9FB80A !important;
+	background: #9FB80A ;
 }
 .top-menu p {
 	margin-bottom: 0;
@@ -89,7 +89,6 @@ p {
 	font-size: 16px;
 	color: #7B7573;
 	font-weight: 400;
-	background: rgb(82, 82, 82);
 }
 .divider {
 	height: 15px;
