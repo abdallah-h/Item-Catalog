@@ -1,8 +1,8 @@
 {% extends "main.html" %}
 {% block content %}
 	<div class="row">
-		<div class="col-md-11 col-md-offset-1 padding-none">
-			<h1>{{ catalog.name }}</h1>
+		<div class="col-md-11">
+			<h1>{{ catalog.name }} Catalog</h1>
 		</div>
 	</div>
 
@@ -20,9 +20,7 @@
 
     </div>
 	<div class="row padding-top padding-bottom">
-		<div class="col-md-1"></div>
-		<div class="col-md-11 padding-none">
-			
+		<div class="col-md-8">
 			<a href="{{url_for('newItem', catalog_name = catalog.name )}}">
 				<button class="btn btn-default">
 					<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Add New Item
@@ -34,18 +32,16 @@
 					</button>
 			</a>
 			<a href="{{url_for('deleteCatalog', catalog_name = catalog.name )}}">
-				<button class="btn btn-default delete">
+				<button class="btn btn-default">
 					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>Delete Catalog
 				</button>
 			</a>
 		</div>
-		<div class="col-md-7"></div>
 	</div>
 	
 	{% if items !=[] %}	
 		<div class="row">
-			<div class="col-md-1"></div>
-			<div class="col-md-9">
+			<div class="col-md-10">
 				{% for i in items %}
                     <a href = "{{url_for('showItem', catalog_name = catalog.name, item_name=i.name)}}">
                         <div class="row">
@@ -58,7 +54,6 @@
                     </a>
 				{% endfor %}
 			</div>
-			<div class="col-md-1"></div>
 		</div>
 	{% endif %}
 {% endblock %}

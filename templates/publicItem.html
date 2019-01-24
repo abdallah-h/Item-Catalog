@@ -1,11 +1,10 @@
 {% extends "main.html" %}
 {% block content %}
 	<div class="row">
-		<div class="col-md-1"></div>
-			<div class="item-details">
-				<h2>{{item.name}}</h2>
-				<p>Description: {{item.description}}</p>
-			</div>
-		<div class="col-md-1"></div>
+		<div class="item-details">
+			<h2>{{item.name}}</h2>
+			<div class="padding-bottom-10"></div>
+			<p>Description: {{item.description}}</p>
+		</div>
 	</div>
 {% endblock %}

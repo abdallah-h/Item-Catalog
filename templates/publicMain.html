@@ -12,15 +12,19 @@
         {% endif %}
         {% endwith %}
     </div>
-	
+    
+    <div class="row">
+        <div class="col-md-10">
+            <h1>Catalogs</h1>
+        </div>
+    </div>
 	{% for i in catalogs %}
 		<a href = "{{url_for('showCatalog', catalog_name = i.name) }}">
 			<div class="row">
 				<div class="col-md-1"></div>
-					<div class="col-md-10 catalog-items">
-						<h3>{{i.name}}</h3>
-					</div>
-				<div class="col-md-1"></div>
+				<div class="col-md-10 catalog-items">
+					<h3>{{i.name}}</h3>
+				</div>
 			</div>
 		</a>
 	{% endfor %}

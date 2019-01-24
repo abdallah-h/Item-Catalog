@@ -69,7 +69,7 @@
             function sendTokenToServer() {
                 var access_token = FB.getAuthResponse()['accessToken'];
                 console.log(access_token)
-                console.log('Welcome!  Fetching your information.... ');
+                console.log('Welcome .... ');
                 FB.api('/me', function(response) {
                     console.log('Successful login for: ' + response.name);
                     $.ajax({
@@ -80,7 +80,7 @@
                         contentType: 'application/octet-stream; charset=utf-8',
                         success: function(result) {
                             if (result) {
-                                $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+                                $('#result').html('You Login Successfully </br>'+ result + '</br>Redirecting to The Main Page...')
                                 setTimeout(function() {
                                     window.location.href = "/catalog";
                                 }, 4000);

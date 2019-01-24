@@ -18,9 +18,9 @@
 			<div class="col-md-5 text-right log-btn">
 				{%if 'username' not in session %}
 					<a href="{{url_for('showLogin')}}">
-							<button class="btn btn-default">
-									<span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>Login
-								</button>
+						<button class="btn btn-default">
+							<span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>Login
+						</button>
 					</a>
 				{% else %}
 					<a href="{{url_for('disconnect')}}">
